@@ -1004,7 +1004,8 @@ function renderMatchCard(p) {
   const ahora = new Date();
   const fechaPartido = parseFechaHora(p.fecha, p.hora);
   const yaInicio = fechaPartido && ahora >= fechaPartido;
-  const bloqueado = p.cerrado || yaInicio;
+  const yaPredicido = hasPred;
+  const bloqueado = p.cerrado || yaInicio || yaPredicido;
 
   let resultHtml = '';
   if (p.cerrado && p.goles1 !== null && p.goles2 !== null) {
@@ -1047,6 +1048,7 @@ function renderMatchCard(p) {
         <input type="number" min="0" max="20" inputmode="numeric" value="${val2}" ${disabled}
                data-partido="${p.id}" data-gol="2" placeholder="-">
       </div>
+      ${yaPredicido && !p.cerrado ? '<div style="text-align:center;font-size:0.72rem;color:var(--cc-blue);margin-top:6px;">Prediccion registrada</div>' : ''}
       ${resultHtml}
     </div>`;
 }

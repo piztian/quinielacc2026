@@ -287,16 +287,14 @@ function doPredecir(body) {
       continue;
     }
 
+    // Si ya tiene prediccion para este partido, no permitir cambio
     if (existentes[pid]) {
-      // Actualizar prediccion existente
-      var rowNum = existentes[pid];
-      predSheet.getRange(rowNum, 1).setValue(now);
-      predSheet.getRange(rowNum, 4).setValue(g1);
-      predSheet.getRange(rowNum, 5).setValue(g2);
-    } else {
-      // Nueva prediccion
-      predSheet.appendRow([now, codigo, pid, g1, g2]);
+      bloqueadas++;
+      continue;
     }
+
+    // Nueva prediccion
+    predSheet.appendRow([now, codigo, pid, g1, g2]);
     guardadas++;
   }
 
