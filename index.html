@@ -633,6 +633,25 @@ body {
     <button class="btn btn-primary" id="btnRegistro" onclick="registrar()">
       Registrarme en la Quiniela
     </button>
+
+    <div style="text-align:center; margin-top:14px;">
+      <button class="btn-logout" style="font-size:0.82rem; color:var(--cc-green-light);" onclick="mostrarLogin()">Ya me registre en otro dispositivo</button>
+    </div>
+  </div>
+
+  <!-- LOGIN RAPIDO -->
+  <div id="loginForm" class="card" style="display:none;">
+    <div id="loginAlert" class="alert"></div>
+    <h3 style="font-size:0.95rem; margin-bottom:12px;">Iniciar sesion</h3>
+    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:14px;">Ingresa el telefono con el que te registraste</p>
+    <div class="form-group">
+      <label>Telefono (10 digitos)</label>
+      <input type="tel" id="loginTelefono" placeholder="10 digitos" maxlength="10" inputmode="numeric">
+    </div>
+    <button class="btn btn-primary" id="btnLogin" onclick="loginConTelefono()">Entrar</button>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn-logout" style="font-size:0.82rem;" onclick="mostrarRegistro()">Aun no tengo cuenta</button>
+    </div>
   </div>
 
   <div id="registroOk" class="card" style="display:none; text-align:center;">
@@ -921,7 +940,48 @@ function cerrarSesion() {
   document.getElementById('predLogin').style.display = 'block';
   document.getElementById('predContent').style.display = 'none';
   document.getElementById('registroForm').style.display = 'block';
+  document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registroOk').style.display = 'none';
+}
+
+function mostrarLogin() {
+  document.getElementById('registroForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+}
+
+function mostrarRegistro() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registroForm').style.display = 'block';
+}
+
+async function loginConTelefono() {
+  const tel = document.getElementById('loginTelefono').value.trim();
+  if (!/^\d{10}$/.test(tel)) {
+    return showAlert('loginAlert', 'Ingresa 10 digitos', 'error');
+  }
+
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true;
+  btn.textContent = 'Buscando...';
+
+  try {
+    const res = await apiGet('login&telefono=' + encodeURIComponent(tel));
+
+    if (res.found) {
+      usuario = { codigo: res.codigo, nombre: res.nombre };
+      localStorage.setItem('quiniela_usuario', JSON.stringify(usuario));
+      mostrarUsuarioLogueado();
+      irATab('predicciones');
+    } else {
+      showAlert('loginAlert', 'Telefono no encontrado. Registrate primero.', 'error');
+    }
+  } catch (err) {
+    showAlert('loginAlert', 'Error de conexion.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Entrar';
+}
 
   irATab('registro');
 }

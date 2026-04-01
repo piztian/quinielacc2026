@@ -70,6 +70,8 @@ function doGet(e) {
     return getRanking();
   } else if (action === 'mis_predicciones') {
     return getMisPredicciones(params.codigo || '');
+  } else if (action === 'login') {
+    return doLogin(params.telefono || '');
   }
 
   return jsonResponse({ error: 'Accion no reconocida' });
@@ -448,6 +450,35 @@ function getRanking() {
   });
 
   return jsonResponse({ ranking: ranking });
+}
+
+// ============================================================
+// LOGIN — Buscar participante por telefono
+// ============================================================
+function doLogin(telefono) {
+  telefono = String(telefono).trim();
+  if (!/^\d{10}$/.test(telefono)) {
+    return jsonResponse({ found: false, message: 'Telefono invalido' });
+  }
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(TAB_PARTICIPANTES);
+  if (!sheet) {
+    return jsonResponse({ found: false, message: 'No hay participantes registrados' });
+  }
+
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][2]).trim() === telefono) {
+      return jsonResponse({
+        found: true,
+        nombre: String(data[i][1]).trim(),
+        codigo: String(data[i][5]).trim()
+      });
+    }
+  }
+
+  return jsonResponse({ found: false, message: 'Telefono no registrado' });
 }
 
 // ============================================================
