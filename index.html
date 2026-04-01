@@ -7,35 +7,35 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   VARIABLES & RESET
-   ============================================================ */
 :root {
+  --cc-blue: #2aabd2;
+  --cc-blue-dark: #1a8aab;
+  --cc-blue-light: #3ec4ec;
   --cc-green: #00a651;
-  --cc-green-dark: #008c44;
   --cc-green-light: #00c95e;
-  --cc-gold: #ffd700;
-  --cc-gold-dark: #e6c200;
-  --bg-dark: #0a1628;
-  --bg-card: rgba(255,255,255,0.06);
-  --bg-card-hover: rgba(255,255,255,0.1);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255,255,255,0.7);
-  --text-muted: rgba(255,255,255,0.45);
-  --border-color: rgba(255,255,255,0.1);
-  --success: #00e676;
-  --error: #ff5252;
-  --warning: #ffab40;
+  --cc-gold: #f5a623;
+  --cc-gold-light: #ffc857;
+  --bg-body: #f5f7fa;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f9fb;
+  --text-primary: #1a2b3c;
+  --text-secondary: #5a6b7d;
+  --text-muted: #9aabbc;
+  --border-color: #e2e8f0;
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #f59e0b;
   --radius: 14px;
   --radius-sm: 8px;
-  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #0a1628 0%, #112240 50%, #0a1628 100%);
+  background: var(--bg-body);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -45,53 +45,72 @@ body {
    HEADER
    ============================================================ */
 .header {
-  background: linear-gradient(135deg, var(--cc-green-dark), var(--cc-green), var(--cc-green-light));
-  padding: 16px 20px;
+  background: #ffffff;
+  padding: 14px 20px;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0,166,81,0.4);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  border-bottom: 3px solid var(--cc-blue);
+}
+
+.header-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 4px;
 }
 
 .header-title {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 800;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
-  text-transform: uppercase;
 }
 
-.header-title .trophy { font-size: 1.5rem; }
-
 .header-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 400;
-  opacity: 0.9;
-  margin-top: 2px;
+  color: var(--text-secondary);
+  margin-top: 1px;
 }
 
 .user-badge {
   display: none;
-  margin-top: 6px;
+  margin-top: 5px;
   font-size: 0.7rem;
-  background: rgba(255,255,255,0.2);
-  display: inline-block;
-  padding: 2px 10px;
+  background: var(--cc-blue);
+  color: #fff;
+  padding: 2px 12px;
   border-radius: 20px;
-  backdrop-filter: blur(10px);
 }
 
 .user-badge.visible { display: inline-block; }
+
+.btn-logout {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-top: 2px;
+}
+.btn-logout:hover { color: var(--error); text-decoration: underline; }
 
 /* ============================================================
    NAV TABS
    ============================================================ */
 .nav-tabs {
   display: flex;
-  background: rgba(0,0,0,0.3);
+  background: #fff;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .nav-tabs::-webkit-scrollbar { display: none; }
 
@@ -102,7 +121,7 @@ body {
   text-align: center;
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s;
   border-bottom: 3px solid transparent;
@@ -110,12 +129,12 @@ body {
   user-select: none;
 }
 
-.nav-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+.nav-tab:hover { color: var(--text-primary); background: #f8f9fb; }
 
 .nav-tab.active {
-  color: var(--cc-green-light);
-  border-bottom-color: var(--cc-green-light);
-  background: rgba(0,166,81,0.08);
+  color: var(--cc-blue);
+  border-bottom-color: var(--cc-blue);
+  font-weight: 600;
 }
 
 /* ============================================================
@@ -136,9 +155,10 @@ body {
 }
 
 .section-title {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   margin-bottom: 16px;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -153,7 +173,7 @@ body {
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
-  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
 
 .form-group {
@@ -172,7 +192,7 @@ body {
 .form-group select {
   width: 100%;
   padding: 12px 14px;
-  background: rgba(255,255,255,0.08);
+  background: #f8f9fb;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -185,11 +205,12 @@ body {
 .form-group input::placeholder { color: var(--text-muted); }
 .form-group input:focus,
 .form-group select:focus {
-  border-color: var(--cc-green);
-  box-shadow: 0 0 0 3px rgba(0,166,81,0.15);
+  border-color: var(--cc-blue);
+  box-shadow: 0 0 0 3px rgba(42,171,210,0.12);
+  background: #fff;
 }
 
-.form-group select option { background: #1a2744; color: #fff; }
+.form-group select option { background: #fff; color: var(--text-primary); }
 
 .btn {
   display: inline-flex;
@@ -207,23 +228,24 @@ body {
   transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-decoration: none;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--cc-green), var(--cc-green-light));
+  background: linear-gradient(135deg, var(--cc-blue), var(--cc-blue-light));
   color: #fff;
-  box-shadow: 0 4px 15px rgba(0,166,81,0.4);
+  box-shadow: 0 4px 15px rgba(42,171,210,0.3);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,166,81,0.5); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(42,171,210,0.4); }
 .btn-primary:active { transform: translateY(0); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.08);
+  background: #f1f5f9;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
-.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+.btn-secondary:hover { background: #e2e8f0; }
 
 /* ============================================================
    ALERTS
@@ -236,19 +258,19 @@ body {
   display: none;
 }
 .alert.show { display: block; animation: fadeIn 0.3s; }
-.alert-success { background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.3); color: var(--success); }
-.alert-error { background: rgba(255,82,82,0.12); border: 1px solid rgba(255,82,82,0.3); color: var(--error); }
+.alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--success); }
+.alert-error { background: #fef2f2; border: 1px solid #fecaca; color: var(--error); }
 
 /* ============================================================
    MATCH CARDS
    ============================================================ */
 .ronda-header {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--cc-gold);
-  padding: 10px 0 6px;
+  color: var(--cc-blue-dark);
+  padding: 12px 0 6px;
   margin-top: 10px;
-  border-bottom: 1px solid rgba(255,215,0,0.15);
+  border-bottom: 2px solid var(--cc-blue);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -259,10 +281,11 @@ body {
   border-radius: var(--radius);
   padding: 14px;
   margin-bottom: 10px;
+  box-shadow: var(--shadow);
   transition: all 0.3s;
 }
-.match-card:hover { background: var(--bg-card-hover); }
-.match-card.cerrado { opacity: 0.7; }
+.match-card:hover { box-shadow: var(--shadow-lg); }
+.match-card.cerrado { opacity: 0.65; }
 
 .match-meta {
   display: flex;
@@ -287,26 +310,19 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .team.right { justify-content: flex-end; text-align: right; }
-
-.team-flag {
-  width: 28px;
-  height: 20px;
-  border-radius: 3px;
-  object-fit: cover;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
 
 .vs-badge {
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-muted);
-  background: rgba(255,255,255,0.05);
-  padding: 4px 8px;
+  background: #f1f5f9;
+  padding: 4px 10px;
   border-radius: 6px;
 }
 
@@ -324,8 +340,8 @@ body {
   font-size: 1.3rem;
   font-weight: 700;
   font-family: 'Poppins', sans-serif;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid var(--border-color);
+  background: #f8f9fb;
+  border: 2px solid var(--border-color);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   outline: none;
@@ -333,13 +349,15 @@ body {
 }
 
 .match-inputs input:focus {
-  border-color: var(--cc-green);
-  box-shadow: 0 0 0 3px rgba(0,166,81,0.15);
+  border-color: var(--cc-blue);
+  box-shadow: 0 0 0 3px rgba(42,171,210,0.12);
+  background: #fff;
 }
 
 .match-inputs input:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  background: #f1f5f9;
 }
 
 .match-inputs .separator {
@@ -348,7 +366,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Resultado real */
 .match-result {
   display: flex;
   justify-content: center;
@@ -356,15 +373,16 @@ body {
   gap: 10px;
   margin-top: 8px;
   padding: 8px;
-  background: rgba(0,0,0,0.2);
+  background: #f8f9fb;
   border-radius: var(--radius-sm);
   font-size: 0.78rem;
+  color: var(--text-secondary);
 }
 
 .result-score {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--cc-gold);
+  color: var(--cc-blue-dark);
 }
 
 .result-badge {
@@ -373,9 +391,9 @@ body {
   font-size: 0.7rem;
   font-weight: 600;
 }
-.result-badge.exacto { background: rgba(0,230,118,0.2); color: var(--success); }
-.result-badge.acierto { background: rgba(255,171,64,0.2); color: var(--warning); }
-.result-badge.fallo { background: rgba(255,82,82,0.15); color: var(--error); }
+.result-badge.exacto { background: #dcfce7; color: var(--success); }
+.result-badge.acierto { background: #fef3c7; color: var(--warning); }
+.result-badge.fallo { background: #fef2f2; color: var(--error); }
 
 /* ============================================================
    RANKING TABLE
@@ -391,8 +409,8 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 8px 6px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px 6px;
+  border-bottom: 2px solid var(--border-color);
   text-align: left;
 }
 
@@ -400,15 +418,15 @@ body {
 .ranking-table td:last-child { text-align: right; }
 
 .ranking-table td {
-  padding: 10px 6px;
+  padding: 12px 6px;
   font-size: 0.85rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
 }
 
 .ranking-table tr.me {
-  background: rgba(0,166,81,0.1);
-  border-left: 3px solid var(--cc-green);
+  background: #eff6ff;
+  border-left: 3px solid var(--cc-blue);
 }
 
 .ranking-pos {
@@ -418,23 +436,17 @@ body {
   display: inline-block;
 }
 
-.ranking-pos.top1 { color: #ffd700; }
-.ranking-pos.top2 { color: #c0c0c0; }
-.ranking-pos.top3 { color: #cd7f32; }
+.ranking-pos.top1 { color: #eab308; }
+.ranking-pos.top2 { color: #94a3b8; }
+.ranking-pos.top3 { color: #c2702a; }
 
-.ranking-name {
-  font-weight: 600;
-}
-
-.ranking-suc {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
+.ranking-name { font-weight: 600; }
+.ranking-suc { font-size: 0.7rem; color: var(--text-muted); }
 
 .ranking-pts {
   font-weight: 800;
   font-size: 1.1rem;
-  color: var(--cc-green-light);
+  color: var(--cc-blue);
 }
 
 /* ============================================================
@@ -447,7 +459,7 @@ body {
 
 .rules-list li {
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid #f1f5f9;
   font-size: 0.85rem;
   color: var(--text-secondary);
   display: flex;
@@ -457,22 +469,22 @@ body {
 .rules-list li .icon { font-size: 1rem; flex-shrink: 0; }
 
 .prize-card {
-  background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.02));
-  border: 1px solid rgba(255,215,0,0.2);
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1px solid #fde68a;
   border-radius: var(--radius);
   padding: 20px;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .prize-card h3 {
-  color: var(--cc-gold);
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+  color: #92400e;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
 }
 
 .prize-card p {
-  color: var(--text-secondary);
+  color: #78716c;
   font-size: 0.85rem;
 }
 
@@ -489,7 +501,7 @@ body {
 }
 
 .footer a {
-  color: var(--cc-green-light);
+  color: var(--cc-blue);
   text-decoration: none;
 }
 
@@ -508,7 +520,7 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--cc-green);
+  background: var(--cc-blue);
   animation: bounce 1.4s infinite ease-in-out both;
 }
 .loading .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -527,46 +539,40 @@ body {
 }
 
 /* ============================================================
-   LOGOUT
+   LINK STYLE BUTTON
    ============================================================ */
-.btn-logout {
+.link-btn {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.6);
+  color: var(--cc-blue);
   font-family: 'Poppins', sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   cursor: pointer;
   padding: 4px 8px;
-  margin-top: 4px;
 }
-.btn-logout:hover { color: #fff; text-decoration: underline; }
+.link-btn:hover { text-decoration: underline; }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (min-width: 768px) {
-  .header-title { font-size: 1.6rem; }
+  .header-title { font-size: 1.4rem; }
   .section { padding: 30px 20px 100px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     HEADER
-     ============================================================ -->
+<!-- HEADER -->
 <header class="header">
-  <div class="header-title">
-    <span class="trophy">&#9917;</span> Quiniela Mundial 2026
-  </div>
+  <img src="logo.jpg" alt="CeluCenter" class="header-logo">
+  <div class="header-title">Quiniela Mundial 2026</div>
   <div class="header-subtitle">CeluCenter &mdash; Predice y Gana</div>
   <div class="user-badge" id="userBadge"></div>
   <div><button class="btn-logout" id="btnLogout" style="display:none" onclick="cerrarSesion()">Cerrar sesion</button></div>
 </header>
 
-<!-- ============================================================
-     NAV
-     ============================================================ -->
+<!-- NAV -->
 <nav class="nav-tabs" id="navTabs">
   <div class="nav-tab active" data-tab="registro">Registro</div>
   <div class="nav-tab" data-tab="predicciones">Predicciones</div>
@@ -574,9 +580,7 @@ body {
   <div class="nav-tab" data-tab="info">Premios</div>
 </nav>
 
-<!-- ============================================================
-     SECTION: REGISTRO
-     ============================================================ -->
+<!-- SECTION: REGISTRO -->
 <section class="section active" id="sec-registro">
   <h2 class="section-title">&#128221; Registro</h2>
 
@@ -602,30 +606,30 @@ body {
       <label>Sucursal mas cercana</label>
       <select id="regSucursal">
         <option value="">Selecciona sucursal...</option>
-        <option value="Tepic Centro">Tepic Centro</option>
-        <option value="Tepic Plaza Forum">Tepic Plaza Forum</option>
-        <option value="Tepic Las Delicias">Tepic Las Delicias</option>
-        <option value="Tepic City Center">Tepic City Center</option>
-        <option value="Tepic Soriana">Tepic Soriana</option>
-        <option value="Tepic Walmart">Tepic Walmart</option>
-        <option value="Ixtlan del Rio">Ixtlan del Rio</option>
-        <option value="Compostela">Compostela</option>
-        <option value="Las Varas">Las Varas</option>
-        <option value="Santiago Ixcuintla">Santiago Ixcuintla</option>
+        <option value="Atequiza">Atequiza</option>
+        <option value="Atoyac">Atoyac</option>
+        <option value="Centro Magno">Centro Magno</option>
+        <option value="Colomo">Colomo</option>
+        <option value="Cotija">Cotija</option>
+        <option value="Gomez Farias">Gomez Farias</option>
+        <option value="Huescalapa">Huescalapa</option>
+        <option value="Jiquilpan">Jiquilpan</option>
+        <option value="Jocotepec">Jocotepec</option>
+        <option value="Matriz">Matriz</option>
+        <option value="Poncitlan">Poncitlan</option>
+        <option value="San Andres Ixtlan">San Andres Ixtlan</option>
+        <option value="San Gabriel">San Gabriel</option>
+        <option value="Santa Cruz">Santa Cruz</option>
+        <option value="Tama">Tama</option>
+        <option value="Tamazula">Tamazula</option>
+        <option value="Tecalitlan">Tecalitlan</option>
+        <option value="Teocuitatlan">Teocuitatlan</option>
+        <option value="Tizapan">Tizapan</option>
+        <option value="Tonaya">Tonaya</option>
         <option value="Tuxpan">Tuxpan</option>
-        <option value="Ruiz">Ruiz</option>
-        <option value="Acaponeta">Acaponeta</option>
-        <option value="Tecuala">Tecuala</option>
-        <option value="Puerto Vallarta Centro">Puerto Vallarta Centro</option>
-        <option value="Puerto Vallarta Pitillal">Puerto Vallarta Pitillal</option>
-        <option value="Puerto Vallarta Las Juntas">Puerto Vallarta Las Juntas</option>
-        <option value="Puerto Vallarta Soriana">Puerto Vallarta Soriana</option>
-        <option value="Bucerias">Bucerias</option>
-        <option value="Mezcales">Mezcales</option>
-        <option value="San Pancho">San Pancho</option>
-        <option value="Sayulita">Sayulita</option>
-        <option value="La Penita">La Penita</option>
-        <option value="Guadalajara">Guadalajara</option>
+        <option value="Usmajac">Usmajac</option>
+        <option value="Zapotiltic">Zapotiltic</option>
+        <option value="Zapotlan">Zapotlan</option>
         <option value="Otra">Otra</option>
       </select>
     </div>
@@ -635,7 +639,7 @@ body {
     </button>
 
     <div style="text-align:center; margin-top:14px;">
-      <button class="btn-logout" style="font-size:0.82rem; color:var(--cc-green-light);" onclick="mostrarLogin()">Ya me registre en otro dispositivo</button>
+      <button class="link-btn" onclick="mostrarLogin()">Ya me registre en otro dispositivo</button>
     </div>
   </div>
 
@@ -650,7 +654,7 @@ body {
     </div>
     <button class="btn btn-primary" id="btnLogin" onclick="loginConTelefono()">Entrar</button>
     <div style="text-align:center; margin-top:10px;">
-      <button class="btn-logout" style="font-size:0.82rem;" onclick="mostrarRegistro()">Aun no tengo cuenta</button>
+      <button class="link-btn" onclick="mostrarRegistro()">Aun no tengo cuenta</button>
     </div>
   </div>
 
@@ -662,9 +666,7 @@ body {
   </div>
 </section>
 
-<!-- ============================================================
-     SECTION: PREDICCIONES
-     ============================================================ -->
+<!-- SECTION: PREDICCIONES -->
 <section class="section" id="sec-predicciones">
   <h2 class="section-title">&#9917; Mis Predicciones</h2>
 
@@ -684,9 +686,7 @@ body {
   </div>
 </section>
 
-<!-- ============================================================
-     SECTION: RANKING
-     ============================================================ -->
+<!-- SECTION: RANKING -->
 <section class="section" id="sec-ranking">
   <h2 class="section-title">&#127942; Ranking General</h2>
   <div id="rankingContent">
@@ -694,9 +694,7 @@ body {
   </div>
 </section>
 
-<!-- ============================================================
-     SECTION: PREMIOS / INFO
-     ============================================================ -->
+<!-- SECTION: PREMIOS / INFO -->
 <section class="section" id="sec-info">
   <h2 class="section-title">&#127873; Premios y Reglas</h2>
 
@@ -736,41 +734,31 @@ body {
   <div class="card">
     <h3 style="margin-bottom:12px; font-size:0.95rem;">Sobre CeluCenter</h3>
     <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.6;">
-      CeluCenter — Tu conexion favorita. Visita cualquiera de nuestras sucursales en Nayarit, Jalisco y mas.
+      CeluCenter — Tu conexion favorita. Visita cualquiera de nuestras sucursales.
     </p>
-    <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="https://wa.me/523111234567" target="_blank" class="btn btn-secondary" style="flex:1; font-size:0.78rem; min-width:140px;">WhatsApp</a>
-      <a href="https://celucentershop.bitrix24.site" target="_blank" class="btn btn-secondary" style="flex:1; font-size:0.78rem; min-width:140px;">Sucursales</a>
+    <div style="margin-top:12px;">
+      <a href="https://celucentershop.bitrix24.site" target="_blank" class="btn btn-secondary" style="font-size:0.78rem;">Ver sucursales</a>
     </div>
   </div>
 </section>
 
-<!-- ============================================================
-     FOOTER
-     ============================================================ -->
+<!-- FOOTER -->
 <div class="footer">
   <p>Quiniela Mundial 2026 &mdash; CeluCenter</p>
   <p style="margin-top:4px;">
     <a href="https://celucentershop.bitrix24.site" target="_blank">Sucursales</a>
-    &nbsp;|&nbsp;
-    <a href="https://wa.me/523111234567" target="_blank">WhatsApp</a>
   </p>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT
-     ============================================================ -->
+<!-- JAVASCRIPT -->
 <script>
-// ==================== CONFIGURACION ====================
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdXDielM1s9JM9VTaowajL0WcNE_DJuFCR6E6Mye7hwMZOKlGNiX_XFi-qWJWDBNru/exec';
 const TOKEN = 'CELUCENTER_QUINIELA_2026';
 
-// ==================== ESTADO ====================
-let usuario = null; // {codigo, nombre}
+let usuario = null;
 let partidos = [];
-let misPredicciones = {}; // partidoId -> {goles1, goles2}
+let misPredicciones = {};
 
-// Banderas ISO -> emoji flags
 const FLAGS = {
   'Mexico': '\u{1F1F2}\u{1F1FD}',
   'Argentina': '\u{1F1E6}\u{1F1F7}',
@@ -830,12 +818,10 @@ function getFlag(equipo) {
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
-  // Tab navigation
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => irATab(tab.dataset.tab));
   });
 
-  // Restaurar sesion
   const saved = localStorage.getItem('quiniela_usuario');
   if (saved) {
     try {
@@ -858,7 +844,6 @@ function irATab(tab) {
   if (tabEl) tabEl.classList.add('active');
   if (secEl) secEl.classList.add('active');
 
-  // Cargar datos segun tab
   if (tab === 'predicciones' && usuario) {
     cargarPartidos();
   } else if (tab === 'ranking') {
@@ -866,9 +851,7 @@ function irATab(tab) {
   }
 }
 
-function irAPredicciones() {
-  irATab('predicciones');
-}
+function irAPredicciones() { irATab('predicciones'); }
 
 // ==================== REGISTRO ====================
 async function registrar() {
@@ -877,7 +860,6 @@ async function registrar() {
   const email = document.getElementById('regEmail').value.trim();
   const sucursal = document.getElementById('regSucursal').value;
 
-  // Validacion frontend
   if (!nombre || nombre.length < 3) return showAlert('registroAlert', 'Ingresa tu nombre completo', 'error');
   if (!/^\d{10}$/.test(telefono)) return showAlert('registroAlert', 'Telefono debe tener 10 digitos', 'error');
   if (!email || !email.includes('@')) return showAlert('registroAlert', 'Correo invalido', 'error');
@@ -888,18 +870,13 @@ async function registrar() {
   btn.textContent = 'Registrando...';
 
   try {
-    const res = await apiPost({
-      action: 'registrar',
-      nombre, telefono, email, sucursal
-    });
+    const res = await apiPost({ action: 'registrar', nombre, telefono, email, sucursal });
 
     if (res.success) {
       usuario = { codigo: res.codigo, nombre: res.nombre || nombre };
       localStorage.setItem('quiniela_usuario', JSON.stringify(usuario));
       mostrarUsuarioLogueado();
       showAlert('registroAlert', res.message, 'success');
-
-      // Mostrar confirmacion
       document.getElementById('registroForm').style.display = 'none';
       document.getElementById('registroOk').style.display = 'block';
       document.getElementById('registroNombreMsg').textContent = 'Bienvenido, ' + usuario.nombre;
@@ -919,12 +896,8 @@ function mostrarUsuarioLogueado() {
   badge.textContent = usuario.nombre;
   badge.classList.add('visible');
   document.getElementById('btnLogout').style.display = 'inline-block';
-
-  // Mostrar panel de predicciones
   document.getElementById('predLogin').style.display = 'none';
   document.getElementById('predContent').style.display = 'block';
-
-  // Mostrar confirmacion en registro
   document.getElementById('registroForm').style.display = 'none';
   document.getElementById('registroOk').style.display = 'block';
   document.getElementById('registroNombreMsg').textContent = 'Bienvenido, ' + usuario.nombre;
@@ -934,7 +907,6 @@ function cerrarSesion() {
   usuario = null;
   misPredicciones = {};
   localStorage.removeItem('quiniela_usuario');
-
   document.getElementById('userBadge').classList.remove('visible');
   document.getElementById('btnLogout').style.display = 'none';
   document.getElementById('predLogin').style.display = 'block';
@@ -942,6 +914,7 @@ function cerrarSesion() {
   document.getElementById('registroForm').style.display = 'block';
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registroOk').style.display = 'none';
+  irATab('registro');
 }
 
 function mostrarLogin() {
@@ -966,7 +939,6 @@ async function loginConTelefono() {
 
   try {
     const res = await apiGet('login&telefono=' + encodeURIComponent(tel));
-
     if (res.found) {
       usuario = { codigo: res.codigo, nombre: res.nombre };
       localStorage.setItem('quiniela_usuario', JSON.stringify(usuario));
@@ -983,16 +955,12 @@ async function loginConTelefono() {
   btn.textContent = 'Entrar';
 }
 
-  irATab('registro');
-}
-
 // ==================== PARTIDOS & PREDICCIONES ====================
 async function cargarPartidos() {
   const container = document.getElementById('partidosList');
   container.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
 
   try {
-    // Cargar partidos y predicciones del usuario en paralelo
     const [resPartidos, resPred] = await Promise.all([
       apiGet('partidos'),
       apiGet('mis_predicciones&codigo=' + encodeURIComponent(usuario.codigo))
@@ -1000,7 +968,6 @@ async function cargarPartidos() {
 
     partidos = resPartidos.partidos || [];
     misPredicciones = {};
-
     (resPred.predicciones || []).forEach(p => {
       misPredicciones[p.partidoId] = { goles1: p.goles1, goles2: p.goles2 };
     });
@@ -1013,13 +980,11 @@ async function cargarPartidos() {
 
 function renderPartidos() {
   const container = document.getElementById('partidosList');
-
   if (!partidos.length) {
     container.innerHTML = '<div class="empty-state">Aun no hay partidos disponibles. Vuelve pronto.</div>';
     return;
   }
 
-  // Agrupar por ronda
   const grupos = {};
   partidos.forEach(p => {
     const ronda = p.ronda || 'General';
@@ -1030,11 +995,8 @@ function renderPartidos() {
   let html = '';
   for (const ronda in grupos) {
     html += `<div class="ronda-header">${ronda}</div>`;
-    grupos[ronda].forEach(p => {
-      html += renderMatchCard(p);
-    });
+    grupos[ronda].forEach(p => { html += renderMatchCard(p); });
   }
-
   container.innerHTML = html;
 }
 
@@ -1094,7 +1056,6 @@ function renderMatchCard(p) {
 async function guardarPredicciones() {
   const inputs = document.querySelectorAll('.match-inputs input:not([disabled])');
   const preds = {};
-
   inputs.forEach(inp => {
     const pid = inp.dataset.partido;
     const gol = inp.dataset.gol;
@@ -1111,27 +1072,17 @@ async function guardarPredicciones() {
     }
   }
 
-  if (!lista.length) {
-    return showAlert('predAlert', 'Ingresa al menos una prediccion', 'error');
-  }
+  if (!lista.length) return showAlert('predAlert', 'Ingresa al menos una prediccion', 'error');
 
   const btn = document.getElementById('btnGuardar');
   btn.disabled = true;
   btn.textContent = 'Guardando...';
 
   try {
-    const res = await apiPost({
-      action: 'predecir',
-      codigo: usuario.codigo,
-      predicciones: lista
-    });
-
+    const res = await apiPost({ action: 'predecir', codigo: usuario.codigo, predicciones: lista });
     if (res.success) {
       showAlert('predAlert', res.message, 'success');
-      // Actualizar predicciones locales
-      lista.forEach(p => {
-        misPredicciones[p.partidoId] = { goles1: p.goles1, goles2: p.goles2 };
-      });
+      lista.forEach(p => { misPredicciones[p.partidoId] = { goles1: p.goles1, goles2: p.goles2 }; });
     } else {
       showAlert('predAlert', res.message || 'Error al guardar', 'error');
     }
@@ -1147,11 +1098,9 @@ async function guardarPredicciones() {
 async function cargarRanking() {
   const container = document.getElementById('rankingContent');
   container.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-
   try {
     const res = await apiGet('ranking');
-    const ranking = res.ranking || [];
-    renderRanking(ranking);
+    renderRanking(res.ranking || []);
   } catch (err) {
     container.innerHTML = '<div class="empty-state">Error al cargar ranking.</div>';
   }
@@ -1159,7 +1108,6 @@ async function cargarRanking() {
 
 function renderRanking(ranking) {
   const container = document.getElementById('rankingContent');
-
   if (!ranking.length) {
     container.innerHTML = '<div class="empty-state">Aun no hay participantes. Se el primero en registrarte!</div>';
     return;
@@ -1168,13 +1116,7 @@ function renderRanking(ranking) {
   let html = `
     <div class="card" style="padding:0; overflow-x:auto;">
       <table class="ranking-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Participante</th>
-            <th style="text-align:right">Pts</th>
-          </tr>
-        </thead>
+        <thead><tr><th>#</th><th>Participante</th><th style="text-align:right">Pts</th></tr></thead>
         <tbody>`;
 
   ranking.forEach((r, i) => {
@@ -1204,25 +1146,20 @@ function renderRanking(ranking) {
 // ==================== UTILIDADES ====================
 function calcPuntos(predG1, predG2, realG1, realG2) {
   if (predG1 === realG1 && predG2 === realG2) return 3;
-  const predRes = Math.sign(predG1 - predG2);
-  const realRes = Math.sign(realG1 - realG2);
-  return predRes === realRes ? 1 : 0;
+  return Math.sign(predG1 - predG2) === Math.sign(realG1 - realG2) ? 1 : 0;
 }
 
 function parseFechaHora(fecha, hora) {
   try {
     if (!fecha) return null;
     if (!hora) hora = '00:00';
-    // Manejar formato yyyy-MM-dd o dd/MM/yyyy
     let dateStr = fecha;
     if (fecha.includes('/')) {
       const parts = fecha.split('/');
       dateStr = parts[2] + '-' + parts[1] + '-' + parts[0];
     }
     return new Date(dateStr + 'T' + hora + ':00');
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 function showAlert(id, msg, type) {
@@ -1242,7 +1179,6 @@ async function apiGet(action) {
 
 async function apiPost(body) {
   body.token = TOKEN;
-  // text/plain evita preflight CORS que Apps Script no soporta
   const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
