@@ -1083,6 +1083,7 @@ async function guardarPredicciones() {
     if (res.success) {
       showAlert('predAlert', res.message, 'success');
       lista.forEach(p => { misPredicciones[p.partidoId] = { goles1: p.goles1, goles2: p.goles2 }; });
+      renderPartidos();
     } else {
       showAlert('predAlert', res.message || 'Error al guardar', 'error');
     }
