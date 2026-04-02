@@ -1114,7 +1114,25 @@ function renderRanking(ranking) {
     return;
   }
 
-  let html = `
+  // Card del usuario logueado arriba
+  let html = '';
+  if (usuario) {
+    const me = ranking.find(r => r.codigo === usuario.codigo);
+    if (me) {
+      const miPos = ranking.indexOf(me) + 1;
+      html += `
+        <div class="card" style="text-align:center; border:2px solid var(--cc-blue); margin-bottom:16px;">
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Tu posicion</div>
+          <div style="font-size:2rem; font-weight:800; color:var(--cc-blue);">#${miPos}</div>
+          <div style="font-size:1rem; font-weight:700; margin:4px 0;">${me.nombre}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:8px;">${me.sucursal}</div>
+          <div style="font-size:1.8rem; font-weight:800; color:var(--cc-blue);">${me.puntos} pts</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">${me.exactos} exacto${me.exactos !== 1 ? 's' : ''} / ${me.aciertos} acierto${me.aciertos !== 1 ? 's' : ''}</div>
+        </div>`;
+    }
+  }
+
+  html += `
     <div class="card" style="padding:0; overflow-x:auto;">
       <table class="ranking-table">
         <thead><tr><th>#</th><th>Participante</th><th style="text-align:right">Pts</th></tr></thead>
@@ -1135,7 +1153,7 @@ function renderRanking(ranking) {
         </td>
         <td style="text-align:right">
           <div class="ranking-pts">${r.puntos}</div>
-          <div style="font-size:0.65rem; color:var(--text-muted)">${r.exactos}E / ${r.aciertos}A</div>
+          <div style="font-size:0.65rem; color:var(--text-muted)">${r.exactos} exacto${r.exactos !== 1 ? 's' : ''} / ${r.aciertos} acierto${r.aciertos !== 1 ? 's' : ''}</div>
         </td>
       </tr>`;
   });
