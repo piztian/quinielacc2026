@@ -27,7 +27,7 @@
  *   A=ID | B=Ronda | C=Equipo1 | D=Equipo2 | E=Fecha | F=Hora | G=Sede | H=Goles1 | I=Goles2 | J=Cerrado
  *
  * ESTRUCTURA DE PESTANA "Participantes":
- *   A=Timestamp | B=Nombre | C=Telefono | D=Email | E=Sucursal | F=Codigo
+ *   A=Timestamp | B=Nombre | C=Telefono | D=Email | E=Sucursal | F=Codigo | G=Ticket
  *
  * ESTRUCTURA DE PESTANA "Predicciones":
  *   A=Timestamp | B=Codigo | C=PartidoID | D=Goles1 | E=Goles2
@@ -46,11 +46,12 @@ var P_RONDA   = 1;  // B
 var P_EQUIPO1 = 2;  // C
 var P_EQUIPO2 = 3;  // D
 var P_FECHA   = 4;  // E
-var P_HORA    = 5;  // F
+var P_HORA    = 5;  // F — hora tiempo del centro de Mexico (CDMX)
 var P_SEDE    = 6;  // G
 var P_GOLES1  = 7;  // H
 var P_GOLES2  = 8;  // I
 var P_CERRADO = 9;  // J
+var P_CANAL   = 10; // K — canal de TV abierta (Canal 5 / Azteca 7)
 
 // ============================================================
 // GET
@@ -70,8 +71,6 @@ function doGet(e) {
     return getRanking();
   } else if (action === 'mis_predicciones') {
     return getMisPredicciones(params.codigo || '');
-  } else if (action === 'login') {
-    return doLogin(params.telefono || '');
   }
 
   return jsonResponse({ error: 'Accion no reconocida' });
@@ -133,6 +132,7 @@ function getPartidos() {
       fecha: formatFecha(row[P_FECHA]),
       hora: String(row[P_HORA] || '').trim(),
       sede: String(row[P_SEDE] || '').trim(),
+      canal: String(row[P_CANAL] || '').trim(),
       goles1: (goles1 !== '' && goles1 !== null && goles1 !== undefined) ? Number(goles1) : null,
       goles2: (goles2 !== '' && goles2 !== null && goles2 !== undefined) ? Number(goles2) : null,
       cerrado: (cerrado === 'TRUE' || cerrado === 'SI' || cerrado === 'VERDADERO')
@@ -150,6 +150,7 @@ function doRegistrar(body) {
   var telefono = String(body.telefono || '').trim();
   var email    = String(body.email || '').trim();
   var sucursal = String(body.sucursal || '').trim();
+  var ticket   = String(body.ticket || '').trim();
 
   // Validaciones
   if (!nombre || nombre.length < 3) {
@@ -164,6 +165,9 @@ function doRegistrar(body) {
   if (!sucursal) {
     return jsonResponse({ success: false, message: 'Selecciona una sucursal' });
   }
+  if (!ticket || ticket.length < 4) {
+    return jsonResponse({ success: false, message: 'Ingresa un no. de ticket valido (minimo 4 caracteres)' });
+  }
 
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var sheet = ss.getSheetByName(TAB_PARTICIPANTES);
@@ -171,13 +175,14 @@ function doRegistrar(body) {
   // Crear pestana si no existe
   if (!sheet) {
     sheet = ss.insertSheet(TAB_PARTICIPANTES);
-    sheet.appendRow(['Timestamp', 'Nombre', 'Telefono', 'Email', 'Sucursal', 'Codigo']);
-    sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
+    sheet.appendRow(['Timestamp', 'Nombre', 'Telefono', 'Email', 'Sucursal', 'Codigo', 'Ticket']);
+    sheet.getRange(1, 1, 1, 7).setFontWeight('bold');
   }
 
   var data = sheet.getDataRange().getValues();
+  var ticketNorm = ticket.toLowerCase();
 
-  // Verificar si el telefono ya esta registrado
+  // Verificar si el telefono ya esta registrado (login automatico)
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][2]).trim() === telefono) {
       return jsonResponse({
@@ -189,11 +194,22 @@ function doRegistrar(body) {
     }
   }
 
+  // Verificar si el ticket ya fue usado por otra persona
+  for (var j = 1; j < data.length; j++) {
+    var tExistente = String(data[j][6] || '').trim().toLowerCase();
+    if (tExistente && tExistente === ticketNorm) {
+      return jsonResponse({
+        success: false,
+        message: 'Este ticket ya fue registrado por otro participante. Usa un ticket de compra diferente.'
+      });
+    }
+  }
+
   // Generar codigo unico
   var codigo = generarCodigo(telefono);
   var now = Utilities.formatDate(new Date(), 'America/Mexico_City', 'dd/MM/yyyy HH:mm:ss');
 
-  sheet.appendRow([now, nombre, telefono, email, sucursal, codigo]);
+  sheet.appendRow([now, nombre, telefono, email, sucursal, codigo, ticket]);
 
   return jsonResponse({
     success: true,
@@ -287,14 +303,16 @@ function doPredecir(body) {
       continue;
     }
 
-    // Si ya tiene prediccion para este partido, no permitir cambio
     if (existentes[pid]) {
-      bloqueadas++;
-      continue;
+      // Actualizar prediccion existente
+      var rowNum = existentes[pid];
+      predSheet.getRange(rowNum, 1).setValue(now);
+      predSheet.getRange(rowNum, 4).setValue(g1);
+      predSheet.getRange(rowNum, 5).setValue(g2);
+    } else {
+      // Nueva prediccion
+      predSheet.appendRow([now, codigo, pid, g1, g2]);
     }
-
-    // Nueva prediccion
-    predSheet.appendRow([now, codigo, pid, g1, g2]);
     guardadas++;
   }
 
@@ -451,35 +469,6 @@ function getRanking() {
 }
 
 // ============================================================
-// LOGIN — Buscar participante por telefono
-// ============================================================
-function doLogin(telefono) {
-  telefono = String(telefono).trim();
-  if (!/^\d{10}$/.test(telefono)) {
-    return jsonResponse({ found: false, message: 'Telefono invalido' });
-  }
-
-  var ss = SpreadsheetApp.openById(SHEET_ID);
-  var sheet = ss.getSheetByName(TAB_PARTICIPANTES);
-  if (!sheet) {
-    return jsonResponse({ found: false, message: 'No hay participantes registrados' });
-  }
-
-  var data = sheet.getDataRange().getValues();
-  for (var i = 1; i < data.length; i++) {
-    if (String(data[i][2]).trim() === telefono) {
-      return jsonResponse({
-        found: true,
-        nombre: String(data[i][1]).trim(),
-        codigo: String(data[i][5]).trim()
-      });
-    }
-  }
-
-  return jsonResponse({ found: false, message: 'Telefono no registrado' });
-}
-
-// ============================================================
 // PUNTUACION
 // ============================================================
 function calcularPuntos(predG1, predG2, realG1, realG2) {
@@ -549,6 +538,56 @@ function jsonResponse(obj) {
 }
 
 // ============================================================
+// PARTIDOS TV ABIERTA MEXICO — Mundial 2026
+// Los partidos confirmados por Televisa + TV Azteca.
+// Ambas televisoras transmiten los mismos encuentros:
+//   - TV Azteca: Azteca 7
+//   - Televisa: Canal 5 (y en algunos casos Las Estrellas / Nu9ve)
+// La gente sin cable puede verlos TODOS por TV abierta.
+//
+// Fuente principal (horarios CDMX y canales confirmados):
+//   https://www.youtube.com/watch?v=o6SEMLrQVq4
+// Complementadas con: Mediotiempo, TV Azteca Deportes, Olympics.com,
+// TUDN, Milenio, DAZN (abril 2026).
+//
+// HORARIOS: tiempo del centro de Mexico (CDMX, CST/CDT).
+//
+// NOTA: El partido por el TERCER LUGAR NO va por TV abierta,
+// solo esta disponible en ViX Premium (pago).
+//
+// Columnas:
+//   ID | Ronda | Equipo1 | Equipo2 | Fecha | Hora CDMX | Sede |
+//   Goles1 | Goles2 | Cerrado | Canal
+//
+// Los equipos "Por definir" se completan cuando FIFA confirme el
+// bracket. Los horarios y sedes de fases finales son estimados
+// segun el fixture oficial de FIFA (confirmar cerca de la fecha).
+// ============================================================
+var PARTIDOS_TV_ABIERTA = [
+  // --- FASE DE GRUPOS (17 partidos) ---
+  ['M01', 'Grupo A',  'Mexico',          'Sudafrica',      '2026-06-11', '13:00', 'Estadio Ciudad de Mexico (INAUGURAL)',  '', '', '', 'Azteca 7 / Canal 5'],
+  ['M02', 'Grupo D',  'Estados Unidos',  'Paraguay',       '2026-06-12', '19:00', 'SoFi Stadium, Los Angeles',             '', '', '', 'Azteca 7 / Canal 5'],
+  ['M03', 'Grupo E',  'Brasil',          'Marruecos',      '2026-06-13', '16:00', 'MetLife Stadium, Nueva York/NJ',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M04', 'Grupo G',  'Paises Bajos',    'Japon',          '2026-06-14', '14:00', 'AT&T Stadium, Dallas',                  '', '', '', 'Azteca 7 / Canal 5'],
+  ['M05', 'Grupo H',  'Argentina',       'Argelia',        '2026-06-16', '19:00', 'Arrowhead Stadium, Kansas City',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M06', 'Grupo B',  'Inglaterra',      'Croacia',        '2026-06-17', '14:00', 'AT&T Stadium, Dallas',                  '', '', '', 'Azteca 7 / Canal 5'],
+  ['M07', 'Grupo A',  'Mexico',          'Corea del Sur',  '2026-06-18', '19:00', 'Estadio Guadalajara',                   '', '', '', 'Azteca 7 / Canal 5'],
+  ['M08', 'Grupo E',  'Brasil',          'Haiti',          '2026-06-19', '16:00', 'Lincoln Financial Field, Philadelphia', '', '', '', 'Azteca 7 / Canal 5'],
+  ['M09', 'Grupo G',  'Paises Bajos',    'Suecia',         '2026-06-20', '11:00', 'NRG Stadium, Houston',                  '', '', '', 'Azteca 7 / Canal 5'],
+  ['M10', 'Grupo F',  'Espana',          'Arabia Saudita', '2026-06-21', '10:00', 'Mercedes-Benz Stadium, Atlanta',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M11', 'Grupo I',  'Noruega',         'Senegal',        '2026-06-22', '18:00', 'MetLife Stadium, Nueva York/NJ',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M12', 'Grupo J',  'Colombia',        'Congo',          '2026-06-23', '20:00', 'Estadio Guadalajara',                   '', '', '', 'Azteca 7 / Canal 5'],
+  ['M13', 'Grupo A',  'Chequia',         'Mexico',         '2026-06-24', '19:00', 'Estadio Ciudad de Mexico',              '', '', '', 'Azteca 7 / Canal 5'],
+  ['M14', 'Grupo L',  'Ecuador',         'Alemania',       '2026-06-25', '14:00', 'MetLife Stadium, Nueva York/NJ',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M15', 'Grupo F',  'Uruguay',         'Espana',         '2026-06-26', '18:00', 'Estadio Guadalajara',                   '', '', '', 'Azteca 7 / Canal 5'],
+  ['M16', 'Grupo B',  'Panama',          'Inglaterra',     '2026-06-27', '15:00', 'MetLife Stadium, Nueva York/NJ',        '', '', '', 'Azteca 7 / Canal 5'],
+  ['M17', 'Grupo J',  'Colombia',        'Portugal',       '2026-06-27', '17:30', 'Hard Rock Stadium, Miami',              '', '', '', 'Azteca 7 / Canal 5'],
+  // NOTA: Las fases eliminatorias (Ronda 32, Octavos, Cuartos, Semis, Final)
+  // se agregaran al Sheet conforme se definan los equipos que clasifican.
+  // El tercer lugar NO va por TV abierta, solo ViX Premium.
+];
+
+// ============================================================
 // SETUP — Ejecutar UNA VEZ para configurar headers y partidos iniciales
 // Menu: Ejecutar > setupHojaQuiniela
 // ============================================================
@@ -560,33 +599,16 @@ function setupHojaQuiniela() {
   if (!shPartidos) {
     shPartidos = ss.insertSheet(TAB_PARTIDOS);
   }
-  // Headers
-  shPartidos.getRange(1, 1, 1, 10).setValues([[
-    'ID', 'Ronda', 'Equipo1', 'Equipo2', 'Fecha', 'Hora', 'Sede', 'Goles1', 'Goles2', 'Cerrado'
+  // Headers (11 columnas)
+  shPartidos.getRange(1, 1, 1, 11).setValues([[
+    'ID', 'Ronda', 'Equipo1', 'Equipo2', 'Fecha', 'Hora CDMX', 'Sede', 'Goles1', 'Goles2', 'Cerrado', 'Canal'
   ]]);
-  shPartidos.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#00a651').setFontColor('#ffffff');
+  shPartidos.getRange(1, 1, 1, 11).setFontWeight('bold').setBackground('#00a651').setFontColor('#ffffff');
 
-  // 13 partidos Ronda 1: 3 de Mexico + 10 partidos clave fase de grupos
-  var partidos = [
-    // Mexico (Grupo A)
-    ['M01', 'Grupo A',  'Mexico',         'Canada',          '2025-06-11', '20:00', 'Estadio Azteca, CDMX',         '', '', ''],
-    ['M02', 'Grupo A',  'Mexico',         'Ecuador',         '2025-06-15', '17:00', 'Estadio Azteca, CDMX',         '', '', ''],
-    ['M03', 'Grupo A',  'Mexico',         'Venezuela',       '2025-06-19', '20:00', 'Rose Bowl, Los Angeles',        '', '', ''],
-    // Partidos clave
-    ['M04', 'Grupo B',  'Estados Unidos', 'Colombia',        '2025-06-12', '18:00', 'SoFi Stadium, Los Angeles',     '', '', ''],
-    ['M05', 'Grupo C',  'Argentina',      'Marruecos',       '2025-06-12', '20:00', 'Hard Rock Stadium, Miami',      '', '', ''],
-    ['M06', 'Grupo D',  'Brasil',         'Japon',           '2025-06-13', '18:00', 'MetLife Stadium, New Jersey',   '', '', ''],
-    ['M07', 'Grupo E',  'Francia',        'Australia',       '2025-06-13', '20:00', 'AT&T Stadium, Dallas',          '', '', ''],
-    ['M08', 'Grupo F',  'Espana',         'Paises Bajos',    '2025-06-14', '18:00', 'Mercedes-Benz Stadium, Atlanta','', '', ''],
-    ['M09', 'Grupo G',  'Inglaterra',     'Senegal',         '2025-06-14', '20:00', 'Lincoln Financial Field, Phila','', '', ''],
-    ['M10', 'Grupo H',  'Alemania',       'Corea del Sur',   '2025-06-15', '20:00', 'NRG Stadium, Houston',          '', '', ''],
-    ['M11', 'Grupo B',  'Estados Unidos', 'Uruguay',         '2025-06-16', '18:00', 'Levi\'s Stadium, San Francisco','', '', ''],
-    ['M12', 'Grupo C',  'Argentina',      'Ecuador',         '2025-06-17', '20:00', 'Hard Rock Stadium, Miami',      '', '', ''],
-    ['M13', 'Grupo D',  'Brasil',         'Nigeria',         '2025-06-18', '18:00', 'MetLife Stadium, New Jersey',   '', '', ''],
-  ];
+  var partidos = PARTIDOS_TV_ABIERTA;
 
   if (shPartidos.getLastRow() <= 1) {
-    shPartidos.getRange(2, 1, partidos.length, 10).setValues(partidos);
+    shPartidos.getRange(2, 1, partidos.length, 11).setValues(partidos);
   }
 
   // Formato fecha
@@ -597,27 +619,29 @@ function setupHojaQuiniela() {
   shPartidos.setColumnWidth(3, 140);  // Equipo1
   shPartidos.setColumnWidth(4, 140);  // Equipo2
   shPartidos.setColumnWidth(5, 100);  // Fecha
-  shPartidos.setColumnWidth(6, 60);   // Hora
-  shPartidos.setColumnWidth(7, 250);  // Sede
+  shPartidos.setColumnWidth(6, 80);   // Hora CDMX
+  shPartidos.setColumnWidth(7, 260);  // Sede
   shPartidos.setColumnWidth(8, 60);   // Goles1
   shPartidos.setColumnWidth(9, 60);   // Goles2
   shPartidos.setColumnWidth(10, 70);  // Cerrado
+  shPartidos.setColumnWidth(11, 160); // Canal
 
   // ---- PARTICIPANTES ----
   var shPart = ss.getSheetByName(TAB_PARTICIPANTES);
   if (!shPart) {
     shPart = ss.insertSheet(TAB_PARTICIPANTES);
   }
-  shPart.getRange(1, 1, 1, 6).setValues([[
-    'Timestamp', 'Nombre', 'Telefono', 'Email', 'Sucursal', 'Codigo'
+  shPart.getRange(1, 1, 1, 7).setValues([[
+    'Timestamp', 'Nombre', 'Telefono', 'Email', 'Sucursal', 'Codigo', 'Ticket'
   ]]);
-  shPart.getRange(1, 1, 1, 6).setFontWeight('bold').setBackground('#00a651').setFontColor('#ffffff');
+  shPart.getRange(1, 1, 1, 7).setFontWeight('bold').setBackground('#00a651').setFontColor('#ffffff');
   shPart.setColumnWidth(1, 150);
   shPart.setColumnWidth(2, 200);
   shPart.setColumnWidth(3, 120);
   shPart.setColumnWidth(4, 200);
   shPart.setColumnWidth(5, 180);
   shPart.setColumnWidth(6, 100);
+  shPart.setColumnWidth(7, 140);
 
   // ---- PREDICCIONES ----
   var shPred = ss.getSheetByName(TAB_PREDICCIONES);
@@ -634,6 +658,66 @@ function setupHojaQuiniela() {
   shPred.setColumnWidth(4, 60);
   shPred.setColumnWidth(5, 60);
 
-  Logger.log('Setup completo: headers + 13 partidos cargados');
-  SpreadsheetApp.getUi().alert('Listo! Headers configurados y 13 partidos de Ronda 1 cargados.');
+  Logger.log('Setup completo: headers + ' + partidos.length + ' partidos de TV abierta cargados');
+  try {
+    SpreadsheetApp.getUi().alert('Listo! Headers configurados y ' + partidos.length + ' partidos de TV abierta cargados.');
+  } catch (e) {}
+}
+
+// ============================================================
+// RECARGAR PARTIDOS TV ABIERTA
+// Reemplaza todos los partidos existentes con los 32 de TV abierta.
+// Usar cuando ya hay partidos viejos/ficticios y quieres resetear.
+// ADVERTENCIA: borra las predicciones que apunten a partidos con otro ID.
+// Menu: Ejecutar > recargarPartidosTVAbierta
+// ============================================================
+function recargarPartidosTVAbierta() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName(TAB_PARTIDOS);
+  if (!sh) {
+    sh = ss.insertSheet(TAB_PARTIDOS);
+  }
+
+  // Limpiar todas las filas de datos (mantener header)
+  var lastRow = sh.getLastRow();
+  if (lastRow > 1) {
+    sh.getRange(2, 1, lastRow - 1, 11).clearContent();
+  }
+
+  // Headers (11 columnas, por si no existen o estan viejos)
+  sh.getRange(1, 1, 1, 11).setValues([[
+    'ID', 'Ronda', 'Equipo1', 'Equipo2', 'Fecha', 'Hora CDMX', 'Sede', 'Goles1', 'Goles2', 'Cerrado', 'Canal'
+  ]]);
+  sh.getRange(1, 1, 1, 11).setFontWeight('bold').setBackground('#00a651').setFontColor('#ffffff');
+
+  // Insertar los 32 partidos de TV abierta
+  var partidos = PARTIDOS_TV_ABIERTA;
+  sh.getRange(2, 1, partidos.length, 11).setValues(partidos);
+
+  // Formato fecha
+  sh.getRange(2, 5, partidos.length, 1).setNumberFormat('yyyy-mm-dd');
+
+  // Ancho columnas
+  sh.setColumnWidth(1, 50);
+  sh.setColumnWidth(2, 90);
+  sh.setColumnWidth(3, 140);
+  sh.setColumnWidth(4, 140);
+  sh.setColumnWidth(5, 100);
+  sh.setColumnWidth(6, 80);
+  sh.setColumnWidth(7, 260);
+  sh.setColumnWidth(8, 60);
+  sh.setColumnWidth(9, 60);
+  sh.setColumnWidth(10, 70);
+  sh.setColumnWidth(11, 160);
+
+  Logger.log('Recarga completa: ' + partidos.length + ' partidos de TV abierta');
+  try {
+    SpreadsheetApp.getUi().alert(
+      'Partidos recargados: ' + partidos.length + ' partidos de TV abierta (Televisa + TV Azteca).\n\n' +
+      '17 de fase de grupos + 15 placeholders para fases finales.\n\n' +
+      'Horarios en tiempo del centro de Mexico (CDMX).\n' +
+      'Todos se transmiten por Azteca 7 y Canal 5.\n\n' +
+      'Actualiza los equipos "Por definir" conforme FIFA confirme el bracket.'
+    );
+  } catch (e) {}
 }
