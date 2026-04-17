@@ -518,6 +518,14 @@ body {
   font-size: 0.85rem;
 }
 
+.prize-card img {
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
 /* ============================================================
    FOOTER
    ============================================================ */
@@ -569,6 +577,91 @@ body {
 }
 
 /* ============================================================
+   CALENDARIO
+   ============================================================ */
+.cal-day {
+  margin-bottom: 20px;
+}
+
+.cal-day-header {
+  background: linear-gradient(135deg, var(--cc-blue), var(--cc-blue-dark));
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cal-day-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cal-day-date {
+  font-size: 0.82rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.cal-match {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 50px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+}
+
+.cal-match:last-child {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cal-match-cerrado {
+  background: #f8f9fb;
+}
+
+.cal-hora {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--cc-blue);
+  white-space: nowrap;
+}
+
+.cal-vs {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.cal-vs strong {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.cal-marcador {
+  background: var(--cc-gold);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.cal-sede {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* ============================================================
    LINK STYLE BUTTON
    ============================================================ */
 .link-btn {
@@ -589,6 +682,73 @@ body {
   .header-title { font-size: 1.4rem; }
   .section { padding: 30px 20px 100px; }
 }
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    border-bottom: 2px solid #000;
+    box-shadow: none;
+    padding: 10px 0;
+  }
+
+  .header-logo { height: 50px; }
+  .header-title { font-size: 16pt; }
+  .header-subtitle, .user-badge, .btn-logout { display: none !important; }
+
+  .nav-tabs { display: none !important; }
+
+  .section { display: none !important; }
+  .section#sec-calendario {
+    display: block !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    animation: none !important;
+  }
+
+  .btn-secondary[onclick*="window.print"] { display: none !important; }
+
+  .cal-day { page-break-inside: avoid; margin-bottom: 16pt; }
+  .cal-day-header {
+    background: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 6pt 12pt;
+  }
+  .cal-day-name { font-size: 11pt; font-weight: 700; }
+  .cal-day-date { font-size: 10pt; }
+
+  .cal-match {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    border-top: none !important;
+    padding: 8pt 12pt;
+    font-size: 11pt;
+  }
+  .cal-match:last-child { border-bottom: 1px solid #ccc !important; border-radius: 0; }
+  .cal-match-cerrado { background: #f5f5f5 !important; }
+  .cal-hora { color: #000 !important; font-size: 10pt; }
+  .cal-marcador {
+    background: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 2pt 8pt;
+    font-size: 11pt;
+    border-radius: 4pt;
+  }
+  .cal-sede { color: #555 !important; }
+}
 </style>
 </head>
 <body>
@@ -608,13 +768,14 @@ body {
   <div class="nav-tab" data-tab="predicciones">Predicciones</div>
   <div class="nav-tab" data-tab="ranking">Ranking</div>
   <div class="nav-tab" data-tab="info">Premios</div>
+  <div class="nav-tab" data-tab="calendario">📅 Calendario</div>
 </nav>
 
 <!-- SECTION: REGISTRO -->
 <section class="section active" id="sec-registro">
   <h2 class="section-title">&#128221; Registro</h2>
 
-  <div id="registroForm" class="card">
+  <div id="registroForm" class="card" style="display:none;">
     <div id="registroAlert" class="alert"></div>
 
     <div class="form-group">
@@ -678,12 +839,12 @@ body {
     </button>
 
     <div style="text-align:center; margin-top:14px;">
-      <button class="link-btn" onclick="mostrarLogin()">Ya me registre en otro dispositivo</button>
+      <button class="link-btn" onclick="mostrarLogin()">Si ya tienes cuenta, inicia sesion aqui</button>
     </div>
   </div>
 
   <!-- LOGIN RAPIDO -->
-  <div id="loginForm" class="card" style="display:none;">
+  <div id="loginForm" class="card">
     <div id="loginAlert" class="alert"></div>
     <h3 style="font-size:0.95rem; margin-bottom:12px;">Iniciar sesion</h3>
     <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:14px;">Ingresa el telefono con el que te registraste</p>
@@ -693,7 +854,7 @@ body {
     </div>
     <button class="btn btn-primary" id="btnLogin" onclick="loginConTelefono()">Entrar</button>
     <div style="text-align:center; margin-top:10px;">
-      <button class="link-btn" onclick="mostrarRegistro()">Aun no tengo cuenta</button>
+      <button class="link-btn" onclick="mostrarRegistro()">Primero participa — Registrate aqui</button>
     </div>
   </div>
 
@@ -733,6 +894,17 @@ body {
   </div>
 </section>
 
+<!-- SECTION: CALENDARIO -->
+<section class="section" id="sec-calendario">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h2 class="section-title" style="margin-bottom:0;">📅 Calendario de Juegos</h2>
+    <button class="btn btn-secondary" style="width:auto; padding:8px 16px; font-size:0.75rem;" onclick="window.print()">🖨️ Imprimir</button>
+  </div>
+  <div id="calendarioContent">
+    <div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</section>
+
 <!-- SECTION: PREMIOS / INFO -->
 <section class="section" id="sec-info">
   <h2 class="section-title">&#127873; Premios y Reglas</h2>
@@ -759,10 +931,25 @@ body {
 
   <div class="prize-card" style="border:2px solid #fde68a;">
     <div style="font-size:0.72rem; font-weight:600; color:var(--cc-blue); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;">Premio Ronda 1 — Fase de Grupos</div>
-    <h3 style="font-size:1.3rem;">&#129351; 1er Lugar</h3>
-    <div style="font-size:2.5rem; margin:10px 0;">&#128241;</div>
-    <p style="font-size:1.1rem; font-weight:700; color:#92400e;">iPhone</p>
-    <p style="font-size:0.78rem; color:#78716c; margin-top:6px;">Para el participante con mas puntos al finalizar la fase de grupos</p>
+    <h3 style="font-size:1.3rem;">&#129351; 1er Lugar — Elige tu premio</h3>
+    <p style="font-size:0.78rem; color:#78716c; margin-bottom:14px;">El participante con mas puntos al finalizar la fase de grupos elige uno:</p>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:10px; text-align:center;">
+        <img src="img/phones/samsung_a17.png" style="width:100%; max-width:120px; margin-bottom:8px;" alt="Samsung A17">
+        <div style="font-size:0.85rem; font-weight:700; color:#92400e;">Samsung A17</div>
+        <div style="font-size:0.68rem; color:#78716c;">Gama media, pantalla grande</div>
+      </div>
+      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:10px; text-align:center;">
+        <img src="img/phones/infinix_hot50pro.png" style="width:100%; max-width:120px; margin-bottom:8px;" alt="Infinix Hot 50 Pro">
+        <div style="font-size:0.85rem; font-weight:700; color:#92400e;">Infinix Hot 50 Pro</div>
+        <div style="font-size:0.68rem; color:#78716c;">Alto rendimiento, gamer</div>
+      </div>
+      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:10px; text-align:center;">
+        <img src="img/phones/redmi_note14.png" style="width:100%; max-width:120px; margin-bottom:8px;" alt="Redmi Note 14">
+        <div style="font-size:0.85rem; font-weight:700; color:#92400e;">Xiaomi Redmi Note 14</div>
+        <div style="font-size:0.68rem; color:#78716c;">Camara top, bateria duradera</div>
+      </div>
+    </div>
   </div>
 
   <div class="card" style="background:#f0fdf4; border:1px solid #bbf7d0; text-align:center; padding:16px;">
@@ -907,6 +1094,8 @@ function irATab(tab) {
     cargarPartidos();
   } else if (tab === 'ranking') {
     cargarRanking();
+  } else if (tab === 'calendario') {
+    loadCalendario();
   }
 }
 
@@ -1227,6 +1416,99 @@ function renderRanking(ranking) {
   });
 
   html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+// ==================== CALENDARIO ====================
+let partidosCalendario = [];
+
+async function loadCalendario() {
+  const container = document.getElementById('calendarioContent');
+  container.innerHTML = '<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+
+  try {
+    const res = await apiGet('partidos');
+    partidosCalendario = res.partidos || [];
+    renderCalendario();
+  } catch (err) {
+    container.innerHTML = '<div class="empty-state">Error al cargar el calendario. Intenta de nuevo.</div>';
+  }
+}
+
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+function fmtFecha(fechaStr) {
+  // acepta YYYY-MM-DD o DD/MM/YYYY
+  let d;
+  if (fechaStr.includes('-')) {
+    const [y, m, day] = fechaStr.split('-');
+    d = new Date(parseInt(y), parseInt(m) - 1, parseInt(day));
+  } else {
+    const parts = fechaStr.split('/');
+    d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+  }
+  const dia  = DIAS[d.getDay()];
+  const num  = d.getDate();
+  const mes  = MESES[d.getMonth()];
+  const anio = d.getFullYear();
+  return { dia, num, mes, anio, key: fechaStr };
+}
+
+function renderCalendario() {
+  const container = document.getElementById('calendarioContent');
+  if (!partidosCalendario.length) {
+    container.innerHTML = '<div class="empty-state">Aún no hay partidos disponibles.</div>';
+    return;
+  }
+
+  // agrupar por fecha
+  const grupos = {};
+  partidosCalendario.forEach(p => {
+    const key = p.fecha || 'Sin fecha';
+    if (!grupos[key]) grupos[key] = [];
+    grupos[key].push(p);
+  });
+
+  // ordenar claves de fecha
+  const claves = Object.keys(grupos).sort();
+
+  let html = '';
+  claves.forEach(key => {
+    const { dia, num, mes, anio } = fmtFecha(key);
+    const partidos = grupos[key];
+
+    html += `<div class="cal-day">
+      <div class="cal-day-header">
+        <span class="cal-day-name">${dia}</span>
+        <span class="cal-day-date">${num} ${mes} ${anio}</span>
+      </div>`;
+
+    partidos.forEach(p => {
+      const hora   = p.hora ? p.hora.substring(0,5) : '--:--';
+      const sede   = p.sede || '';
+      const eq1    = p.equipo1 || '?';
+      const eq2    = p.equipo2 || '?';
+      const cerrado = p.cerrado;
+      const g1      = p.goles1 !== null && p.goles1 !== undefined ? p.goles1 : '';
+      const g2      = p.goles2 !== null && p.goles2 !== undefined ? p.goles2 : '';
+
+      let marcadorHtml = '';
+      if (cerrado && g1 !== '' && g2 !== '') {
+        marcadorHtml = `<span class="cal-marcador">${g1} - ${g2}</span>`;
+      }
+
+      html += `<div class="cal-match${cerrado ? ' cal-match-cerrado' : ''}">
+        <span class="cal-hora">${hora}</span>
+        <span class="cal-vs">${eq1} <strong>vs</strong> ${eq2}</span>
+        ${marcadorHtml}
+        <span class="cal-sede">${sede}</span>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
   container.innerHTML = html;
 }
 
