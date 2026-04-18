@@ -589,8 +589,22 @@ body {
 .cal-marcador { display: none; }
 
 /* ==================== CALENDARIO 2 COLUMNS ==================== */
-#sec-calendario { max-width: 800px !important; }
+#sec-calendario { max-width: 800px !important; position: relative; }
 #sec-calendario .section-title { font-size: 1.1rem !important; margin-bottom: 12px !important; }
+#sec-calendario::before {
+  content: 'CELUCENTER';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 6rem;
+  font-weight: 900;
+  color: rgba(26,78,120,0.05);
+  pointer-events: none;
+  z-index: 0;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  user-select: none;
+}
 
 .cal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 
@@ -610,9 +624,10 @@ body {
   body { background: #fff !important; font-size: 9pt !important; }
   .header, .nav-tabs, #sec-calendario .btn-secondary, .user-badge, .btn-logout { display: none !important; }
   #sec-calendario { display: block !important; padding: 0 !important; max-width: 100% !important; }
-  #sec-calendario .section-title { font-size: 14pt !important; margin-bottom: 8pt !important; }
-  .cal-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 4pt !important; }
-  .cal-day-mini { border: 1pt solid #ccc !important; border-radius: 3pt !important; margin-bottom: 0 !important; }
+  #sec-calendario::before { font-size: 4in !important; color: rgba(26,78,120,0.07) !important; }
+  #sec-calendario .section-title { font-size: 14pt !important; margin-bottom: 8pt !important; position: relative !important; z-index: 1; }
+  .cal-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 4pt !important; position: relative !important; z-index: 1; }
+  .cal-day-mini { border: 1pt solid #ccc !important; border-radius: 3pt !important; margin-bottom: 0 !important; position: relative !important; z-index: 1; }
   .cal-day-header-mini { background: #1F4E78 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 3pt 6pt !important; font-size: 7pt !important; }
   .cal-match-mini { padding: 5pt 6pt !important; font-size: 7pt !important; border-top: 0.5pt solid #ddd !important; }
   .cal-flag { font-size: 9pt !important; }
