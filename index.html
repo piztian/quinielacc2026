@@ -711,6 +711,32 @@ body {
     animation: none !important;
   }
 
+  #sec-calendario .print-only-header {
+    display: flex !important;
+    align-items: center;
+    gap: 12pt;
+    margin-bottom: 12pt;
+    padding-bottom: 8pt;
+    border-bottom: 2pt solid #1F4E78;
+  }
+  #sec-calendario .print-only-header img {
+    width: 50pt;
+    height: auto;
+  }
+  #sec-calendario .print-only-header h2 {
+    font-size: 16pt;
+    color: #1F4E78;
+    margin: 0;
+    font-weight: 900;
+  }
+  #sec-calendario .print-only-header span {
+    font-size: 9pt;
+    color: #888;
+    display: block;
+    margin-top: 2pt;
+  }
+  #sec-calendario > div:first-of-type { display: none !important; }
+
   .btn-secondary[onclick*="window.print"] { display: none !important; }
 
   .cal-day { page-break-inside: avoid; margin-bottom: 16pt; }
@@ -892,6 +918,13 @@ body {
 
 <!-- SECTION: CALENDARIO -->
 <section class="section" id="sec-calendario">
+  <div class="print-only-header">
+    <img src="celucenter_logo.png" alt="CeluCenter">
+    <div>
+      <h2>Quiniela Mundial 2026 — CeluCenter</h2>
+      <span>Calendario de Juegos — celucentermx.github.io/quinielacc2026</span>
+    </div>
+  </div>
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <h2 class="section-title" style="margin-bottom:0;">📅 Calendario de Juegos</h2>
     <button class="btn btn-secondary" style="width:auto; padding:8px 16px; font-size:0.75rem;" onclick="window.print()">🖨️ Imprimir</button>
